@@ -46,14 +46,15 @@ app.use(express.static(path.join(__dirname, "/public")));
 const store = MongoStore.create({
     mongoUrl: dbUrl,
     crypto:{
-        secret:process.env.SECRET,
+        secret: process.env.SECRET,
     },
-    touchAfter:24*3600,
+    touchAfter: 24 * 3600,
 });
 
-store.on("error",()=>{
+store.on("error", () => {
     console.log("ERROR in Mongo Session Store ");
 });
+
 const sessionOptions = {
     store,
     secret: process.env.SECRET,
@@ -82,19 +83,20 @@ app.use((req, res, next) => {
     next();
 });
 
+// ✅ Home route — must come BEFORE the error handler
+app.get("/", (req, res) => {
+    res.redirect("/listings"); // or "/paintings" if it's a painting-selling app
+});
+
 // Routes
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-// Error handling middleware
+// ❌ Error handling middleware (MUST be last)
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "Something went wrong" } = err;
     res.status(statusCode).render("error.ejs", { message });
-});
-// Home route
-app.get("/", (req, res) => {
-    res.redirect("/listings"); // or use "/paintings" if it's a painting-selling app
 });
 
 // Start server

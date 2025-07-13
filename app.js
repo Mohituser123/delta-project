@@ -92,6 +92,10 @@ app.use((err, req, res, next) => {
     let { statusCode = 500, message = "Something went wrong" } = err;
     res.status(statusCode).render("error.ejs", { message });
 });
+// Home route
+app.get("/", (req, res) => {
+    res.redirect("/listings"); // or use "/paintings" if it's a painting-selling app
+});
 
 // Start server
 app.listen(8080, () => {
